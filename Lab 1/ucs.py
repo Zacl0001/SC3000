@@ -13,7 +13,7 @@ with open('Dist.json', 'r') as file:
 with open('Cost.json', 'r') as file:
     cost = json.load(file)
 
-def dfs(maxenergy, start, end):
+def ucs(maxenergy, start, end):
     totaldist = {start: 0}
     energy = {start: 0}
     parent = {}
@@ -45,7 +45,7 @@ def dfs(maxenergy, start, end):
 
 energy = 287932
 S, T = '1', '50'
-path, min_dist, total_energy = dfs(energy, S, T)
+path, min_dist, total_energy = ucs(energy, S, T)
 if path is None:
     print("No path available")
 else:
