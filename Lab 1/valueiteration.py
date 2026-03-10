@@ -35,7 +35,7 @@ def move_right(x,y):
 q_table = [[[0 for _ in range(4)] for _ in range(5)] for _ in range(5)]
 v_table = [[0 for _ in range(5)] for _ in range(5)]
 reward_table = [[-1 for _ in range(5)] for _ in range(5)]
-reward_table[4][4] = 9
+reward_table[4][4] = 9 #reach from previous to (4,4) requires
 #a_0: up, a_1: left, a_2: down, a_3: right
 #(1,2) and (3,2) are not accessible
 
@@ -55,7 +55,7 @@ for i in range(1,100):
             q_table[x][y][1] = 0.8*(reward_table[x_left][y]+gamma*v_table[x_left][y])+0.1*(reward_table[x][y_down]+gamma*v_table[x][y_down])+0.1*(reward_table[x][y_up]+gamma*v_table[x][y_up])
             q_table[x][y][2] = 0.8*(reward_table[x][y_down]+gamma*v_table[x][y_down])+0.1*(reward_table[x_left][y]+gamma*v_table[x_left][y])+0.1*(reward_table[x_right][y]+gamma*v_table[x_right][y])
             q_table[x][y][3] = 0.8*(reward_table[x_right][y]+gamma*v_table[x_right][y])+0.1*(reward_table[x][y_down]+gamma*v_table[x][y_down])+0.1*(reward_table[x][y_up]+gamma*v_table[x][y_up])
-            v_table[x][y] = max(q_table[x][y])
+            v_table[x][y] = max(q_table[x][y]) #take the max of the q_values and update in the v_table
     print()
     print(f"Value table (iteration {i}):")
     for x in range(5):
