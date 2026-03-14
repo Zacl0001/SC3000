@@ -127,16 +127,9 @@ def calculate_rewards(episode, sample_returns, q_table):
     length = len(episode)
     final_index = length-2 # initialise final_index to be the final reward
     i = 2
-
-    def is_first_visit(index): 
-        '''check whether the state-action pair at index is a first-visit'''
-        
-        for i in range(0, index, 3): 
-            if (episode[i] == episode[index]) and (episode[i+1] == episode[index+1]): 
-                return False
-            
-        return True
+    
     while i <= final_index:
+        # We use the coordinates, rewards and actions for each state for the new q value calculation
         x,y = episode[i+1]
         reward = episode[i]
         action = episode[i-1]
