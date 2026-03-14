@@ -127,7 +127,7 @@ def calculate_rewards(episode, sample_returns, q_table):
     length = len(episode)
     final_index = length-2 # initialise final_index to be the final reward
     i = 2
-    
+
     while i <= final_index:
         # We use the coordinates, rewards and actions for each state for the new q value calculation
         x,y = episode[i+1]
@@ -138,6 +138,7 @@ def calculate_rewards(episode, sample_returns, q_table):
         qmax = max(q_table[x_next][y_next]["U"], q_table[x_next][y_next]["D"], q_table[x_next][y_next]["L"], q_table[x_next][y_next]["R"])
         q_table[x][y][action] = q_table[x][y][action] + 0.1 * (reward + GAMMA * qmax - q_table[x][y][action])
         i += 3
+    print_q_table(q_table)
 
 
 def update_policy(pi, q_table): 
