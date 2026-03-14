@@ -70,7 +70,6 @@ def dijkstra_shortest_path(graph: dict, dist, start, goal):
     return distances[goal], path
 
 
-
 # Define heuristic
 # Computes Euclidean distance between node and goal
 # Straight line distance represents minimum possible distance between 2 points
@@ -216,14 +215,12 @@ def main():
     total_distance, path = astar(G, Coord, Dist, Cost, start, goal)
 
     if path is None:
-        print("No path found")
+        print(f"No path found from {start} to {goal}.")
     else:
         print("Shortest path:", "->".join(path))
         print("Shortest distance:", total_distance)
         print(f"Total energy cost: {path_energy_cost(path, Cost)}")
     print()
-
-
 
 
 if __name__ == "__main__": 
