@@ -110,7 +110,7 @@ def generate_episode(pi, reward_table):
     x,y = 0,0
     episode = [(0,0)]
 
-    while (x != 4) or (y != 4): 
+    while x != 4 or y != 4: 
         action = get_action(x, y, pi)
         x,y = get_next_state(x, y, action, True)
         reward = reward_table[x][y]
@@ -130,15 +130,15 @@ def calculate_rewards(episode, sample_returns, q_table):
 
     while i <= final_index:
         # We use the coordinates, rewards and actions for each state for the new q value calculation
-        x,y = episode[i+1]
-        reward = episode[i]
+        x,y = episode[i-2]
         action = episode[i-1]
+        reward = episode[i]   
         # alpha = 0.1
         x_next,y_next = get_next_state(x, y, action, False)
         qmax = max(q_table[x_next][y_next]["U"], q_table[x_next][y_next]["D"], q_table[x_next][y_next]["L"], q_table[x_next][y_next]["R"])
         q_table[x][y][action] = q_table[x][y][action] + 0.1 * (reward + GAMMA * qmax - q_table[x][y][action])
         i += 3
-    print_q_table(q_table)
+    
 
 
 def update_policy(pi, q_table): 
@@ -200,6 +200,7 @@ def main():
         update_policy(pi, q_table)
 
         # print results
+        print_q_table(q_table)
         print(f"Policy after {num+1} episodes (seed = {my_seed}): ")
         print_policy(pi)
         print("\n\n")
