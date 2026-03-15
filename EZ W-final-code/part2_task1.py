@@ -93,9 +93,7 @@ def print_policy(policy):
         print("\t".join(row))
     print("-" * 40)
 
-#-----------------
 #value iteration
-#-----------------
 print("\nValue Iteration\n")
 V = np.zeros((grid_size,grid_size))
 policy = np.empty((grid_size, grid_size), dtype=str)
@@ -127,9 +125,7 @@ while True:
 print("Optimal Policy from Value Iteration:")
 print_policy(policy)
 
-#-----------------
 #policy iteration
-#-----------------
 print("\nPolicy Iteration\n")
 #step up initial policy
 policy_pi = np.full((grid_size, grid_size), "U", dtype=str)
