@@ -1,6 +1,7 @@
 import heapq
 import math
 import json
+import time
 
 # STEP 1: Load files
 with open("G.json", "r") as f:
@@ -36,8 +37,12 @@ def astar(G, Coord, Cost, start, goal):
     energy_score = {start: 0} # Total energy consumed to reach this node
     parent = {}
 
+    nodes_expanded = 0
+
     while open_set:
         f, current = heapq.heappop(open_set) # Pop node with the lowest f_score (most promising node)
+
+        nodes_expanded += 1
 
         if current == goal:
             # Reconstruct path by following parent pointers from goal back to start
@@ -47,7 +52,7 @@ def astar(G, Coord, Cost, start, goal):
                 current = parent[current]
             path.append(start)
             path.reverse()
-            return path
+            return path, nodes_expanded
 
         # Explore neighbors
         for neighbor in G[current]:
@@ -73,7 +78,7 @@ def astar(G, Coord, Cost, start, goal):
                 heapq.heappush(open_set, (f_score, neighbor))
 
     # Return None if no valid path satisfies the energy constraint
-    return None
+    return None, nodes_expanded
 
 # Compute total distance and total energy cost of the final path
 def compute_metrics(path, Dist, Cost):
@@ -92,7 +97,23 @@ def compute_metrics(path, Dist, Cost):
 start = "1"
 goal = "50"
 energy_budget = 287932
-path = astar(G, Coord, Cost, start, goal)
+runs = 1000
+runtimes = []
+path = None
+nodes_expanded = None
+
+for i in range(runs):
+    start_time = time.perf_counter()
+    p, n = astar(G, Coord, Cost, start, goal)
+    end_time = time.perf_counter()
+
+    runtimes.append(end_time - start_time)
+
+    if path is None:
+        path = p
+        nodes_expanded = n
+
+avg_runtime = sum(runtimes) / runs
 
 if path is None:
     print("No path found")
@@ -102,3 +123,5 @@ else:
     print("Shortest path:", "->".join(path))
     print("Shortest distance:", distance)
     print("Total energy cost:", energy)
+    print("Nodes expanded:", nodes_expanded)
+    print("A* avg runtime:", avg_runtime)
