@@ -132,9 +132,9 @@ def calculate_rewards(episode, q_table):
         # We use the coordinates, rewards and actions for each state for the new q value calculation
         x,y = episode[i-2]
         action = episode[i-1]
-        reward = episode[i]   
-        # alpha = 0.1
+        reward = episode[i]
         x_next,y_next = episode[i+1]
+        # alpha = 0.1
         qmax = max(q_table[x_next][y_next]["U"], q_table[x_next][y_next]["D"], q_table[x_next][y_next]["L"], q_table[x_next][y_next]["R"])
         q_table[x][y][action] = q_table[x][y][action] + 0.1 * (reward + GAMMA * qmax - q_table[x][y][action])
         i += 3
