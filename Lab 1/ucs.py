@@ -53,7 +53,7 @@ def ucs(maxenergy, start, end):
 
 energy = 287932
 S, T = '1', '50'
-runs = 1000
+runs = 100
 runtimes = []
 path = None
 nodes_expanded = None
@@ -82,5 +82,5 @@ else:
     print("->".join(path))
     print(f"Shortest distance: {min_dist}")
     print(f"Total energy cost: {total_energy}")
-    print("Nodes expanded:", nodes_expanded)
-    print("UCS avg runtime:", avg_runtime)
+    print(f"Nodes expanded: {nodes_expanded}")
+    print(f"UCS avg runtime of {runs} runs: {avg_runtime}")

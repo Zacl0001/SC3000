@@ -97,7 +97,7 @@ def compute_metrics(path, Dist, Cost):
 start = "1"
 goal = "50"
 energy_budget = 287932
-runs = 1000
+runs = 100
 runtimes = []
 path = None
 nodes_expanded = None
@@ -124,4 +124,4 @@ else:
     print("Shortest distance:", distance)
     print("Total energy cost:", energy)
     print("Nodes expanded:", nodes_expanded)
-    print("A* avg runtime:", avg_runtime)
+    print(f"A* avg runtime of {runs} runs: {avg_runtime}")
