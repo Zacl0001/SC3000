@@ -32,11 +32,10 @@ def get_action(x, y, pi):
         elif 0.950 <= prob_float < 0.975: return "U"
         else: return "D" 
 
-def get_next_state(x, y, action: str, stochastic: bool): 
+def get_next_state(x, y, action: str): 
     '''
-    input the coordinates of the current state and the action to take  
-    input whether stochastic transition is involved for getting the next state
-    output the coordinates of the next state
+    input the coordinates of the current state, and the action to take  
+    output the coordinates of the next state  
     (note that stochastic transition causes the intended action to execute not as planned)
     '''
     def reach_roadblock(x, y): # x is row, y is col
@@ -78,19 +77,19 @@ def get_next_state(x, y, action: str, stochastic: bool):
 
     prob_float = random.random()
     if action == "U": 
-        if stochastic == False or 0 <= prob_float < 0.8: return move_up(x, y)
+        if 0 <= prob_float < 0.8: return move_up(x, y)
         elif 0.8 <= prob_float < 0.9: return move_left(x, y)
         else: return move_right(x, y)
     elif action == "D": 
-        if stochastic == False or 0 <= prob_float < 0.8: return move_down(x, y)
+        if 0 <= prob_float < 0.8: return move_down(x, y)
         elif 0.8 <= prob_float < 0.9: return move_left(x, y)
         else: return move_right(x, y)
     elif action == "L": 
-        if stochastic == False or 0 <= prob_float < 0.8: return move_left(x, y)
+        if 0 <= prob_float < 0.8: return move_left(x, y)
         elif 0.8 <= prob_float < 0.9: return move_up(x, y)
         else: return move_down(x, y)
     else: 
-        if stochastic == False or 0 <= prob_float < 0.8: return move_right(x, y)
+        if 0 <= prob_float < 0.8: return move_right(x, y)
         elif 0.8 <= prob_float < 0.9: return move_up(x, y)
         else: return move_down(x, y)
 
@@ -111,9 +110,9 @@ def generate_episode(pi, reward_table):
     x,y = 0,0
     episode = [(0,0)]
 
-    while x != 4 or y != 4: 
+    while (x != 4) or (y != 4): 
         action = get_action(x, y, pi)
-        x,y = get_next_state(x, y, action, True)
+        x,y = get_next_state(x, y, action)
         reward = reward_table[x][y]
         episode.extend([action, reward, (x,y)])
 
@@ -126,21 +125,26 @@ def generate_episode(pi, reward_table):
 
 def calculate_rewards(episode, sample_returns, q_table): 
     length = len(episode)
-    final_index = length-2 # initialise final_index to be the final reward
-    i = 2
+    cumulative_reward = 0
+    index = length-2 # initialise index to be the final reward
 
-    while i <= final_index:
-        # We use the coordinates, rewards and actions for each state for the new q value calculation
-        x,y = episode[i-2]
-        action = episode[i-1]
-        reward = episode[i]   
-        # alpha = 0.1
-        x_next,y_next = get_next_state(x, y, action, False)
-        qmax = max(q_table[x_next][y_next]["U"], q_table[x_next][y_next]["D"], q_table[x_next][y_next]["L"], q_table[x_next][y_next]["R"])
-        q_table[x][y][action] = q_table[x][y][action] + 0.1 * (reward + GAMMA * qmax - q_table[x][y][action])
-        i += 3
+    def is_first_visit(index): 
+        '''check whether the state-action pair at index is a first-visit'''
+        
+        for i in range(0, index, 3): 
+            if (episode[i] == episode[index]) and (episode[i+1] == episode[index+1]): 
+                return False
+            
+        return True
     
-
+    while index > 0: 
+        cumulative_reward = episode[index] + cumulative_reward * GAMMA # calculate first-visit accumulated rewards R
+        if is_first_visit(index-2): 
+            x,y = episode[index-2]
+            action = episode[index-1]
+            sample_returns[x][y][action].append(cumulative_reward)
+            q_table[x][y][action] =  statistics.mean(sample_returns[x][y][action]) # average sample_returns and save into q_table 
+        index -= 3
 
 def update_policy(pi, q_table): 
     '''update the whole policy based on q_table while being greedy'''
@@ -201,7 +205,6 @@ def main():
         update_policy(pi, q_table)
 
         # print results
-        print_q_table(q_table)
         print(f"Policy after {num+1} episodes (seed = {my_seed}): ")
         print_policy(pi)
         print("\n\n")
