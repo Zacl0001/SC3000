@@ -3,6 +3,7 @@
 import json
 import heapq
 from math import inf, sqrt
+import  time
 
 energy_budget = 287932
 
@@ -27,6 +28,8 @@ def dijkstra_shortest_path(graph: dict, dist, start, goal):
     start = str(start)
     goal = str(goal)
 
+    nodes_expanded = 0
+
     if start not in graph:
         raise ValueError(f"Start node '{start}' not found in graph")
     if goal not in graph:
@@ -40,6 +43,8 @@ def dijkstra_shortest_path(graph: dict, dist, start, goal):
 
     while min_heap:
         current_dist, u = heapq.heappop(min_heap)
+
+        nodes_expanded += 1
 
         if current_dist > distances[u]:
             continue
@@ -58,7 +63,7 @@ def dijkstra_shortest_path(graph: dict, dist, start, goal):
                 heapq.heappush(min_heap, (candidate, v))
 
     if distances.get(goal, inf) == inf:
-        return inf, []
+        return inf, [], nodes_expanded
     
     path = []
     node = goal
@@ -67,7 +72,7 @@ def dijkstra_shortest_path(graph: dict, dist, start, goal):
         node = previous[node]
     path.reverse()
 
-    return distances[goal], path
+    return distances[goal], path, nodes_expanded
 
 
 def heuristic(v, goal, Coord):
@@ -91,8 +96,12 @@ def ucs(G, Dist, Cost, start, goal):
     energy_score = {start: 0} # Total energy consumed to reach this node
     parent = {}
 
+    # Track number of nodes expanded
+    nodes_expanded = 0
+
     while open_set:
         dist, current = heapq.heappop(open_set) # Pop node with the lowest total distance (most promising node)
+        nodes_expanded +=1
 
         if current == goal:
             # Reconstruct path by following parent pointers from goal back to start
@@ -102,7 +111,7 @@ def ucs(G, Dist, Cost, start, goal):
                 current = parent[current]
             path.append(start)
             path.reverse()
-            return totaldist[goal], path
+            return totaldist[goal], path,  nodes_expanded
         # Explore neighbours
         for neighbour in G[current]:
             # Compute tentative distance and energy cost to the neighbour
@@ -120,7 +129,7 @@ def ucs(G, Dist, Cost, start, goal):
                 heapq.heappush(open_set, (tentative_dist, neighbour))
 
     # Return None if no valid path satisfies the energy constraint
-    return inf, None
+    return inf, None, nodes_expanded
 
 # Run A*
 def astar(G, Coord, Dist, Cost, start, goal):
@@ -133,8 +142,13 @@ def astar(G, Coord, Dist, Cost, start, goal):
     energy_score = {start: 0} # Total energy consumed to reach this node
     parent = {}
 
+    # Track number of nodes expanded
+    nodes_expanded = 0
+
     while open_set:
         f, current = heapq.heappop(open_set) # Pop node with the lowest f_score (most promising node)
+
+        nodes_expanded += 1
 
         if current == goal:
             # Reconstruct path by following parent pointers from goal back to start
@@ -144,7 +158,7 @@ def astar(G, Coord, Dist, Cost, start, goal):
                 current = parent[current]
             path.append(start)
             path.reverse()
-            return g_score[goal], path
+            return g_score[goal], path, nodes_expanded
 
         # Explore neighbour
         for neighbour in G[current]:
@@ -170,7 +184,17 @@ def astar(G, Coord, Dist, Cost, start, goal):
                 heapq.heappush(open_set, (f_score, neighbour))
 
     # Return None if no valid path satisfies the energy constraint
-    return inf, None
+    return inf, None, nodes_expanded
+
+def runtime(func, runs, *args):
+    total = 0
+
+    for _ in range(runs):
+        start = time.perf_counter()
+        func(*args)
+        total += time.perf_counter() - start
+
+    return total / runs
 
 
 def main():
@@ -186,10 +210,13 @@ def main():
 
     start = input("Enter start node: ").strip()
     goal = input("Enter goal node: ").strip()
+    runs = int(input("Enter number of runs (for runtime calc): ").strip())
+
     # task 1: no energy constraint
     print("-----TASK 1-----")
 
-    total_distance, path = dijkstra_shortest_path(G, Dist, start, goal)
+    total_distance, path, nodes = dijkstra_shortest_path(G, Dist, start, goal)
+    avg_runtime = runtime(dijkstra_shortest_path, runs, G, Dist, start, goal)
 
     if path is None:
         print(f"No path found from {start} to {goal}.")
@@ -197,11 +224,14 @@ def main():
         print("Shortest path:", "->".join(path))
         print(f"Shortest distance: {total_distance}")
         print(f"Total energy cost: {path_energy_cost(path, Cost)}")
+        print(f"Nodes expanded: {nodes}")
+        print(f"Average runtime over {runs} runs: {avg_runtime:.6f} seconds")
     print()
 
     #task 2: Uninformed search algorithm
     print("-----TASK 2-----")
-    total_distance, path = ucs(G, Dist, Cost, start, goal)
+    total_distance, path, nodes = ucs(G, Dist, Cost, start, goal)
+    avg_runtime = runtime(ucs, runs, G, Dist, Cost, start, goal)
 
     if path is None:
         print(f"No path found from {start} to {goal}.")
@@ -209,11 +239,14 @@ def main():
         print("Shortest path:", "->".join(path))
         print(f"Shortest distance: {total_distance}")
         print(f"Total energy cost: {path_energy_cost(path, Cost)}")
+        print(f"Nodes expanded: {nodes}")
+        print(f"average runtime over {runs} runs: {avg_runtime:.6f} seconds")
     print()
 
     #task 3: A* Search algorithm
     print("-----TASK 3-----")
-    total_distance, path = astar(G, Coord, Dist, Cost, start, goal)
+    total_distance, path, nodes = astar(G, Coord, Dist, Cost, start, goal)
+    avg_runtime = runtime(astar, runs, G, Coord, Dist, Cost, start, goal)
 
     if path is None:
         print(f"No path found from {start} to {goal}.")
@@ -221,6 +254,8 @@ def main():
         print("Shortest path:", "->".join(path))
         print("Shortest distance:", total_distance)
         print(f"Total energy cost: {path_energy_cost(path, Cost)}")
+        print(f"Nodes expanded: {nodes}")
+        print(f"Average runtime over {runs} runs: {avg_runtime:.6f} seconds")
     print()
 
 
