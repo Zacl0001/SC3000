@@ -1,0 +1,18 @@
+[trace] 28 ?- unethical(stevey).
+   Call: (14) unethical(stevey) ? creep
+   Call: (15) boss(stevey, _21116) ? creep
+   Exit: (15) boss(stevey, appy) ? creep
+   Call: (15) rival(_22890, appy) ? creep
+   Call: (16) competitor(_22890, appy) ? creep
+   Exit: (16) competitor(sumsum, appy) ? creep
+   Exit: (15) rival(sumsum, appy) ? creep
+   Call: (15) business(_26436) ? creep
+   Call: (16) smart_phone_tech(_26436) ? creep
+   Exit: (16) smart_phone_tech(galactica_s3) ? creep
+   Exit: (15) business(galactica_s3) ? creep
+   Call: (15) developed(sumsum, galactica_s3) ? creep
+   Exit: (15) developed(sumsum, galactica_s3) ? creep
+   Call: (15) stolen(stevey, galactica_s3) ? creep
+   Exit: (15) stolen(stevey, galactica_s3) ? creep
+   Exit: (14) unethical(stevey) ? creep
+true. 
